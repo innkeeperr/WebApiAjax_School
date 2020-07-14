@@ -1,0 +1,67 @@
+﻿<div>
+	<h1>Calculations</h1>
+	<form>
+		x = <input type="text" id="x" />
+		y = <input type="text" id="y" />
+		<input type="button" id="calc" value="Call API (jQuery)" />
+		<input type="button" id="calc2" value="Call API (vanilla JS)" />
+	</form>
+	x + y = <span id="sum"></span><br />
+	x - y = <span id="difference"></span><br />
+	x * y = <span id="product"></span><br />
+	x / y = <span id="quotient"></span><br />
+</div>
+
+<script type="text/javascript">
+	var btn = document.getElementById("calc2");
+	btn.addEventListener('click', onClick, false);
+	$(document).ready(function () {
+		$("#calc").click(function () {
+			var x = $("#x").val();
+			var y = $("#y").val();
+			$.ajax({
+				type: "GET",
+				data: { x, y },
+				url: "/api/math",
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				
+			}).done(data => {
+				$("#sum").text(data.Sum);
+				$("#difference").text(data.Difference);
+				$("#product").text(data.Product);
+				$("#quotient").text(data.Quotient);
+			})
+		})
+	})
+
+	function onClick() {
+		var x1 = document.getElementById("x").value;
+		var y1 = document.getElementById("y").value;
+
+		if (window.XMLHttpRequest) {
+			var http = new XMLHttpRequest();
+			var url = "/api/math";
+			http.open("GET", url + "?" + "x=" + x1 + "&y=" + y1, true);
+			var parameters = JSON.stringify({ x: x1, y: y1 });
+			http.setRequestHeader("Content-type", "application/json; charset=utf-8");
+			http.onreadystatechange = function () {
+				var text = JSON.parse(http.responseText);
+				console.log(text)
+				if (http.readyState == 4 && http.status == 200) {
+					let el1 = document.getElementById("sum");
+					let el2 = document.getElementById("difference");
+					let el3 = document.getElementById("product");
+					let el4 = document.getElementById("quotient");
+					el1.innerHTML = text.Sum;
+					el2.innerHTML = text.Difference;
+					el3.innerHTML = text.Product;
+					el4.innerHTML = text.Quotient;
+				}
+			}
+			http.send(parameters);
+		} else {
+			console.log("Blad");
+		}
+	}
+</script>
